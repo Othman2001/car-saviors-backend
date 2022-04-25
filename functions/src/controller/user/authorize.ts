@@ -1,17 +1,21 @@
 import * as functions from "firebase-functions";
 
-import { auth } from "./create";
+import { auth, db } from "./create";
 // @ts-ignore
 
 export const authorize = functions.https.onRequest(async (req, res) => {
   const userEmail = req.body.email;
-  const user = await auth.getUserByEmail(userEmail);
-  const userRole = user.customClaims?.role;
+  const { uid } = await auth.getUserByEmail(userEmail);
 
-  if (userRole) {
+  const users: any = (await db.collection("users").doc(uid).get()).data();
+
+  if (users) {
     return res.status(200).send({
       message: "user authorized",
-      role: userRole,
+      user: users,
+      rentedCar: users.rentedCar,
+      rentingCar: users.rentingCar,
+      visitedWorkShops: users.visitedWorkShops,
     });
   } else {
     return res.status(404).send({

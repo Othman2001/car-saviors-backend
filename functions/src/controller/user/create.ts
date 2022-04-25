@@ -20,34 +20,40 @@ export const createUser = functions.https.onRequest(async (req, res) => {
       message: "missing required fields",
     });
   }
+  const userID = uuidv4();
   const userData = await auth.createUser({
     email: req.body.email,
     password: req.body.password,
     displayName: req.body.firstName + " " + req.body.lastName,
     disabled: false,
     emailVerified: true,
-    uid: uuidv4(),
+    uid: userID,
   });
 
   await db.collection("users").doc(userData.uid).set({
-    id: userData.uid,
+    id: userID,
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
+    role: "user",
     password: req.body.password,
+    visitedWorkShops: 0,
+    rentedCar: 0,
+    rentingCar: 0,
   });
   await auth.setCustomUserClaims(userData.uid, {
     role: "user",
   });
 
-  const customClaims = await (
-    await auth.getUser(userData.uid)
-  ).customClaims?.role;
+  const customClaims = await (await auth.getUser(userID)).customClaims?.role;
   if (customClaims) {
     return res.status(200).send({
       message: "user created",
       user: userData,
       role: customClaims,
+      visitedWorkShops: 0,
+      rentedCar: 0,
+      rentingCar: 0,
     });
   }
 });
