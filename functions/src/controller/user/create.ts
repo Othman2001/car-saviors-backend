@@ -1,9 +1,8 @@
 import * as admin from "firebase-admin";
-import User from "../../models/User";
 import { v4 as uuidv4 } from "uuid";
 import * as functions from "firebase-functions";
 
-const serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = require("../../serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -12,53 +11,49 @@ admin.initializeApp({
 export const db = admin.firestore();
 export const auth = admin.auth();
 
-export const createUser = functions.https.onRequest(
-  async (req: functions.https.Request, res: functions.Response<any>) => {
-    functions.logger.info("createUser", req.body);
-    try {
-      const { firstName, lastName, password, email, role } = req.body;
+// @ts-ignore
+export const createUser = functions.https.onRequest(async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
 
-      const user = new User(
-        req.body.firstName,
-        req.body.lastName,
-        req.body.email,
-        req.body.password,
-        uuidv4()
-      );
-      const userData = await user.registerUser();
-      await db.collection("users").doc(userData.uid).set({
-        firstName,
-        lastName,
-        email: userData.email,
-        role,
-        userId: userData.uid,
-        password,
-      });
-      const { uid } = await auth.createUser({
-        email,
-        password,
-        displayName: firstName + lastName,
-        disabled: false,
-      });
-      await auth.setCustomUserClaims(uid, {
-        role,
-      });
-
-      return res.status(201).send({
-        message: "user created successfully",
-        data: {
-          id: uid,
-          userData,
-        },
-      });
-    } catch (err) {
-      //   @ts-ignore
-      return handleError(res, err);
-    }
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).send({
+      message: "missing required fields",
+    });
   }
-);
+  const userID = uuidv4();
+  const userData = await auth.createUser({
+    email: req.body.email,
+    password: req.body.password,
+    displayName: req.body.firstName + " " + req.body.lastName,
+    disabled: false,
+    emailVerified: true,
+    uid: userID,
+  });
 
-function handleError(res: Response, err: any) {
-  // @ts-ignore
-  return res.status(500).send({ message: `${err.code}-${err.message}` });
-}
+  await db.collection("users").doc(userData.uid).set({
+    id: userID,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    role: "user",
+    password: req.body.password,
+    visitedWorkShops: 0,
+    rentedCar: 0,
+    rentingCar: 0,
+  });
+  await auth.setCustomUserClaims(userData.uid, {
+    role: "user",
+  });
+
+  const customClaims = await (await auth.getUser(userID)).customClaims?.role;
+  if (customClaims) {
+    return res.status(200).send({
+      message: "user created",
+      user: userData,
+      role: customClaims,
+      visitedWorkShops: 0,
+      rentedCar: 0,
+      rentingCar: 0,
+    });
+  }
+});
