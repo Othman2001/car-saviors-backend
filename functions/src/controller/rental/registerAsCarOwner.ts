@@ -6,8 +6,15 @@ import { db } from "../user/create";
 // @ts-ignore
 export const registerAsCarOwner = functions.https.onRequest(
   async (req, res) => {
-    const { phoneNumber, carModel, carColor, carNumber, userId, images } =
-      req.body;
+    const {
+      phoneNumber,
+      carModel,
+      carColor,
+      carNumber,
+      userId,
+      images,
+      imageUrl,
+    } = req.body;
 
     const carId = uuidv4();
     await db.collection("cars").doc(carId).set({
@@ -18,6 +25,7 @@ export const registerAsCarOwner = functions.https.onRequest(
       carColor,
       carNumber,
       images,
+      imageUrl,
     });
     await db.collection("users").doc(userId).update({
       role: "car-owner",
