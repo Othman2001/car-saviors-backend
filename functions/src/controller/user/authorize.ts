@@ -16,6 +16,7 @@ export const authorize = functions.https.onRequest(async (req, res) => {
       rentedCar: users.rentedCar,
       rentingCar: users.rentingCar,
       visitedWorkShops: users.visitedWorkShops,
+      role: users.role,
     });
   } else {
     return res.status(404).send({
