@@ -7,6 +7,12 @@ import { fetchBrands } from "./controller/workshops/fetchBrands";
 import { fetchWorkshops } from "./controller/workshops/fetchWorkshops";
 import { fetchWorkshop } from "./controller/workshops/fetchWorkshop";
 import { bookDate } from "./controller/workshops/book";
+import { fetchDrivers } from "./controller/winch /fetchDrivers";
+import { fetchRequests } from "./controller/rental/fetchRequests";
+import { fetchUsers } from "./controller/admin/fetchUsers";
+import { fetchDriversAdmin } from "./controller/admin/fetchDrivers";
+import { createUserAdmin } from "./controller/admin/createUserAdmin";
+
 module.exports = {
   createUser,
   authorize,
@@ -17,4 +23,9 @@ module.exports = {
   fetchWorkshops,
   fetchWorkshop,
   bookDate,
+  fetchDrivers,
+  fetchRequests,
+  fetchUsers,
+  fetchDriversAdmin,
+  createUserAdmin,
 };

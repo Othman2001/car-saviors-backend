@@ -36,7 +36,7 @@ export const rentCar = functions.https.onRequest(async (req, res) => {
         .where("dates", "array-contains", date)
         .get();
       if (!startDateCollections.empty || !endDateCollections.empty) {
-        res.status(500).send({
+        res.status(200).send({
           message: "car is rented on this date",
         });
         throw new Error();
@@ -77,7 +77,7 @@ export const rentCar = functions.https.onRequest(async (req, res) => {
         message: "car rented successfully",
       });
     } else {
-      res.status(500).send({
+      res.status(200).send({
         message: "sorry the care is already rented in this date",
       });
     }

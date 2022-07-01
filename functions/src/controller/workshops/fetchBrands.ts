@@ -2,7 +2,6 @@ import * as functions from "firebase-functions";
 import { db } from "../user/create";
 
 export const fetchBrands = functions.https.onRequest(async (req, res) => {
-  await db.collection("carWorkshops").doc("kia").listCollections();
   let brands: any = [];
   await db
     .collection("carWorkshops")
