@@ -13,9 +13,9 @@ export const auth = admin.auth();
 
 // @ts-ignore
 export const createUser = functions.https.onRequest(async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, phoneNumber } = req.body;
 
-  if (!firstName || !lastName || !email || !password) {
+  if (!firstName || !lastName || !email || !password || !phoneNumber) {
     return res.status(400).send({
       message: "missing required fields",
     });
@@ -37,7 +37,7 @@ export const createUser = functions.https.onRequest(async (req, res) => {
     email: req.body.email,
     role: "user",
     password: req.body.password,
-    // phoneNumber: req.body.phoneNumber,
+    phoneNumber: req.body.phoneNumber,
   });
   await auth.setCustomUserClaims(userData.uid, {
     role: "user",
@@ -49,7 +49,7 @@ export const createUser = functions.https.onRequest(async (req, res) => {
       message: "user created",
       user: userData,
       role: customClaims,
-      // phoneNumber,
+      phoneNumber: req.body.phoneNumber,
     });
   }
 });

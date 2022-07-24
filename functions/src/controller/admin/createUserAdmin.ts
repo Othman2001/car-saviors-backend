@@ -34,9 +34,6 @@ export const createUserAdmin = functions.https.onRequest(async (req, res) => {
       email: req.body.email,
       role: "user",
       password: req.body.password,
-      visitedWorkShops: 0,
-      rentedCar: 0,
-      rentingCar: 0,
     });
     await auth.setCustomUserClaims(userData.uid, {
       role: "user",

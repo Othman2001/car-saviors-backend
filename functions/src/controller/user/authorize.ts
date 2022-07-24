@@ -25,6 +25,7 @@ export const authorize = functions.https.onRequest(async (req, res) => {
         rentingCar: users.rentingCar,
         visitedWorkShops: users.visitedWorkShops,
         role: users.role,
+        phoneNumber: users.phoneNumber,
       });
     }
   } else {
