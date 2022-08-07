@@ -10,13 +10,24 @@ export const authorize = functions.https.onRequest(async (req, res) => {
   const users: any = (await db.collection("users").doc(uid).get()).data();
 
   if (users) {
-    return res.status(200).send({
-      message: "user authorized",
-      user: users,
-      rentedCar: users.rentedCar,
-      rentingCar: users.rentingCar,
-      visitedWorkShops: users.visitedWorkShops,
-    });
+    if (users.role === "driver") {
+      return res.status(200).send({
+        message: "success ",
+        user: users,
+        geopoint: users.geopoint,
+        role: users.role,
+      });
+    } else {
+      return res.status(200).send({
+        message: "user authorized",
+        user: users,
+        rentedCar: users.rentedCar,
+        rentingCar: users.rentingCar,
+        visitedWorkShops: users.visitedWorkShops,
+        role: users.role,
+        phoneNumber: users.phoneNumber,
+      });
+    }
   } else {
     return res.status(404).send({
       message: "user not found",

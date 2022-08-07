@@ -19,6 +19,7 @@ export const rentCar = functions.https.onRequest(async (req, res) => {
     total,
     startDate,
     endDate,
+    phoneNumber,
   } = req.body;
 
   const rentalCollections = db.collection("rental");
@@ -36,7 +37,7 @@ export const rentCar = functions.https.onRequest(async (req, res) => {
         .where("dates", "array-contains", date)
         .get();
       if (!startDateCollections.empty || !endDateCollections.empty) {
-        res.status(500).send({
+        res.status(200).send({
           message: "car is rented on this date",
         });
         throw new Error();
@@ -59,13 +60,14 @@ export const rentCar = functions.https.onRequest(async (req, res) => {
 
     const field = admin.firestore.FieldValue;
     if (startDateCollections.empty || endDateCollections.empty) {
-      await rentalCollections.doc(uid(3)).set({
+      await rentalCollections.doc(uid(10)).set({
         carId,
         carOwnerId,
         userId,
         dates,
         daysCount,
         total,
+        phoneNumber,
       });
       await db
         .collection("users")
@@ -77,7 +79,7 @@ export const rentCar = functions.https.onRequest(async (req, res) => {
         message: "car rented successfully",
       });
     } else {
-      res.status(500).send({
+      res.status(200).send({
         message: "sorry the care is already rented in this date",
       });
     }
